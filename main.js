@@ -2,6 +2,7 @@ var app = angular.module('app', ['ngCytoscape']);
 
 app.controller('MainCtrl', function($scope, cytoData){
 
+	//cytoData 에서 그래프 컨트롤을 위한 객체를 가져온다. 당장은 필요 없음.
 	cytoData.getGraph('core').then(function(graph){
 	    $scope.graph = graph;
 	});
@@ -10,16 +11,6 @@ app.controller('MainCtrl', function($scope, cytoData){
 		title:"",
 		content:""
 	};
-
-	var layouts = [
-        {name:'grid', animate: true},
-        {name:'circle', animate: true},
-        {name:'cose', animate: true},
-        {name:'concentric', animate: true},
-        {name:'breadthfirst', animate: true},
-        {name:'random', animate: true}
-    ];
-
 
     $scope.cy = {
     	elements:[
@@ -45,7 +36,6 @@ app.controller('MainCtrl', function($scope, cytoData){
     };
 
     $scope.updateLayout = function(layout) {
-		console.log(layout);
 		$scope.cy.layout = layout;
 	}
 
