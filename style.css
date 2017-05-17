@@ -1,0 +1,32 @@
+body { 
+  font: 14px helvetica neue, helvetica, arial, sans-serif;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.left-menu {
+  position:absolute;
+  width:200px;
+  padding:20px;
+  top:0px;
+  height:100vh;
+}
+
+.ngCytoscape{
+    position:absolute;
+    background-color:#f1f1f1;
+    border:2px solid #dddddd;
+    left: 200px;
+    top:0;    
+    right:0;
+    bottom:0;
+}
+
+.full-width {
+  width:100%;
+}

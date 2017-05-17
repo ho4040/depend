@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app="app">
+	<head>
+		<title> Depends </title>
+
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, target-densityDpi=device-dpi">
+
+		<script src="bower_components/jquery/dist/jquery.js"></script>
+		<link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+		<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+		<script src="bower_components/angular/angular.js"></script>
+		<script src="bower_components/cytoscape/dist/cytoscape.js"></script>
+		<script src="bower_components/ngCytoscape/ngCytoscape.js"></script>
+
+		<link href="style.css" rel="stylesheet" />
+
+	</head>
+
+	<body ng-controller="MainCtrl">		
+	
+		<div class="left-menu">
+
+			<h1>DEPEND*</h1>
+
+			<h3>Selected</h3>
+			<div class="panel panel-default">
+				<div class="panel-body">
+
+					<input  class="form-control input-sm" type="text" ng-model="form.title" placeholder="title"/>
+
+					<textarea class="form-control" ng-model="form.content" placeholder="contents"></textarea>
+				</div>
+			</div>
+			
+			<h3>Layout</h3>
+			<div class="btn-group-vertical full-width">
+				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'circle', animate:true})">Circle</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'cose', animate:true})">Cose</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'breadthfirst', animate:true})">breadthfirst</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'grid', animate:true})">grid</button>
+			</div>
+
+			<h3>Node</h3>
+			<div class="btn-group-vertical full-width">
+				<button type="button" class="btn btn-default btn-xs" ng-click="onClickAddChild()">Add Child</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="onClickAddSibling()">Add Sibling</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="moveToUp()">up</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="moveToDown()">down</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="moveToLeft()">left</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="moveToRight()">right</button>
+				<button type="button" class="btn btn-default btn-xs" ng-click="remove()">remove</button>
+			</div>
+
+
+			<h3>Move</h3>
+			<div class="btn-group-vertical full-width">
+				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToUp()">Up</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToDown()">Down</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToLeft()">Left</button>
+				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToRight()">Right</button>
+			</div>
+
+		</div>
+
+		<cytoscape  graph-elements="cy.elements" graph-layout="cy.layout" graph-style="cy.style" ></cytoscape>
+		
+	</body>
+
+	<script src="main.js"></script>
+
+</html>
