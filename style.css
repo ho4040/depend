@@ -11,10 +11,20 @@ body {
 
 .left-menu {
   position:absolute;
-  width:200px;
+  width:200px;  
   padding:20px;
   top:0px;
   height:100vh;
+}
+
+.right-menu {
+  position:absolute;
+  right:0px;
+  top:0px;
+  bottom:0px;
+  width:400px;
+  height:100vh;
+  padding:20px;
 }
 
 .ngCytoscape{
@@ -23,7 +33,7 @@ body {
     border:2px solid #dddddd;
     left: 200px;
     top:0;    
-    right:0;
+    right:400px;
     bottom:0;
 }
 
