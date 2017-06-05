@@ -20,7 +20,7 @@
 
 	</head>
 
-	<body ng-controller="MainCtrl" ng-keyup="onKeyUp($event)">		
+	<body ng-controller="MainCtrl" ng-keydown="onKeyDown($event)">		
 
 		<cytoscape  graph-elements="cy.elements" graph-layout="cy.layout" graph-style="cy.style" ></cytoscape>
 
@@ -56,34 +56,56 @@
 			</div>
 			-->
 
-			<label>Keyboard short cuts</label>
-			<div class="row">
-				<div class="col-xs-3 text-right">
-					Select :
+			<label>Short cuts</label>
+			<div class="row" style="line-height: 1.5">
+				
+				<div class="col-xs-4 text-right">
+					Edit :
 				</div>
-				<div class="col-xs-9">
-					<span class="label label-default">Arrow key</span>
+				<div class="col-xs-8">
+					<span class="label label-default">Ctrl</span> + <span class="label label-default">Enter</span>
 				</div>
-
-				<div class="col-xs-3 text-right">
+				
+				<div class="col-xs-4 text-right">
 					Insert :
 				</div>
-				<div class="col-xs-9">
+				<div class="col-xs-8">
 					<span class="label label-default">Ctrl</span> + <span class="label label-default">Insert</span>
 				</div>
 
-				<div class="col-xs-3 text-right">
-					Edit :
+				<div class="col-xs-4 text-right">
+					Select :
 				</div>
-				<div class="col-xs-9">
-					<span class="label label-default">Ctrl</span> + <span class="label label-default">Enter</span>
+				<div class="col-xs-8">
+					<span class="label label-default">←</span>
+					<span class="label label-default">↑</span>
+					<span class="label label-default">→</span>
+					<span class="label label-default">↓</span>
 				</div>
 
-				<div class="col-xs-3 text-right">
+				<div class="col-xs-4 text-right">
+					Move :
+				</div>
+				<div class="col-xs-8">
+					<span class="label label-default">Ctrl</span> + 
+					<span class="label label-default">←</span>
+					<span class="label label-default">↑</span>
+					<span class="label label-default">→</span>
+					<span class="label label-default">↓</span>
+				</div>
+
+				<div class="col-xs-4 text-right">
 					Remove :
 				</div>
-				<div class="col-xs-9">
+				<div class="col-xs-8">
 					<span class="label label-default">Delete</span>
+				</div>
+
+				<div class="col-xs-4 text-right">
+					Chage layout :
+				</div>
+				<div class="col-xs-8">
+					<span class="label label-default">Ctrl</span> + <span class="label label-default">.</span>
 				</div>
 			</div>
 		</div>

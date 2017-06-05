@@ -4,8 +4,9 @@ app.controller("NodeEditModalCtrl", function($scope, $uibModalInstance, item, ti
 	$scope.opt = {
 		title:title
 	};
+	$scope.lastKeyState = {};
 
-	$scope.onKeyUp = function(event) {
+	$scope.onKeyDown = function(event) {
 
 
 		var state = {
@@ -15,13 +16,21 @@ app.controller("NodeEditModalCtrl", function($scope, $uibModalInstance, item, ti
 				keyCode:event.keyCode
 		}
 
-		if(!!state.ctrl && state.keyCode == 13) //ctrl + space
+		if(JSON.stringify($scope.lastKeyState) != JSON.stringify(state))
 		{
-			console.log('node-edit-modal on key up');
-			$uibModalInstance.close($scope.item);
+
+			$scope.lastKeyState = state;
+
+			if(!!state.ctrl && state.keyCode == 13) //ctrl + space
+			{
+				console.log('node-edit-modal on key up');
+				$uibModalInstance.close($scope.item);
+			}
+
 		}
-		
+
 		event.stopPropagation();
+		
 	}
 
 	$scope.opened = true;

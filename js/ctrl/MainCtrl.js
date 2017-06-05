@@ -11,6 +11,8 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 	}
 
+	$scope.lastKeyStae = {};
+
 	
 	$scope.modalInstance = null;
 
@@ -55,7 +57,7 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 	};
 
 	
-	$scope.onKeyUp = function(event) {
+	$scope.onKeyDown = function(event) {
 
 		if(!!$scope.modalInstance)
 			return;
@@ -66,42 +68,48 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 				alt:event.altKey, 
 				keyCode:event.keyCode
 		}
+
+		if(JSON.stringify($scope.lastKeyStae) != JSON.stringify(state))
+		{
+			
+			$scope.lastKeyStae = state;
+
+			console.log("main-keyup", state);
+			if(!!state.ctrl && state.keyCode == 13) //ctrl + space
+			{
+				$scope.editNode();			
+			}
+			else if(!!state.ctrl && state.keyCode == 45) //ctrl + Insert
+			{
+				$scope.addNewNode();
+			}	
+			else if(!!state.ctrl && state.keyCode == 190) //ctrl+.
+			{
+				$scope.nextLayout();
+			}
+			else if(state.keyCode == 46) // delete
+			{
+				$scope.delete();
+			}
+			else if(state.keyCode == 38) // up
+			{
+				$scope.select({x:0,y:-1});
+			}
+			else if(state.keyCode == 40) // down
+			{
+				$scope.select({x:0,y:1});
+			}
+			else if(state.keyCode == 37) // left
+			{
+				$scope.select({x:-1,y:0});
+			}
+			else if(state.keyCode == 39) // right
+			{
+				$scope.select({x:1,y:0});	
+			}
+		}
+
 		
-		console.log("main-keyup", state);
-
-
-		if(!!state.ctrl && state.keyCode == 13) //ctrl + space
-		{
-			$scope.editNode();			
-		}
-		else if(!!state.ctrl && state.keyCode == 45) //ctrl + Insert
-		{
-			$scope.addNewNode();
-		}	
-		else if(!!state.ctrl && state.keyCode == 190) //ctrl+.
-		{
-			$scope.nextLayout();
-		}
-		else if(state.keyCode == 46) // delete
-		{
-			$scope.delete();
-		}
-		else if(state.keyCode == 38) // up
-		{
-			$scope.select({x:0,y:-1});
-		}
-		else if(state.keyCode == 40) // down
-		{
-			$scope.select({x:0,y:1});
-		}
-		else if(state.keyCode == 37) // left
-		{
-			$scope.select({x:-1,y:0});
-		}
-		else if(state.keyCode == 39) // right
-		{
-			$scope.select({x:1,y:0});	
-		}
 		
 	}
 
