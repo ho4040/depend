@@ -55,8 +55,6 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 	};
 
 	
-
-
 	$scope.onKeyUp = function(event) {
 
 		if(!!$scope.modalInstance)
@@ -69,9 +67,10 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 				keyCode:event.keyCode
 		}
 		
-		console.log(state);
+		console.log("main-keyup", state);
 
-		if(!!state.ctrl && state.keyCode == 32) //ctrl + space
+
+		if(!!state.ctrl && state.keyCode == 13) //ctrl + space
 		{
 			$scope.editNode();			
 		}
@@ -86,6 +85,22 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 		else if(state.keyCode == 46) // delete
 		{
 			$scope.delete();
+		}
+		else if(state.keyCode == 38) // up
+		{
+			$scope.select({x:0,y:-1});
+		}
+		else if(state.keyCode == 40) // down
+		{
+			$scope.select({x:0,y:1});
+		}
+		else if(state.keyCode == 37) // left
+		{
+			$scope.select({x:-1,y:0});
+		}
+		else if(state.keyCode == 39) // right
+		{
+			$scope.select({x:1,y:0});	
 		}
 		
 	}
@@ -111,6 +126,70 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 	$scope.delete = function()
 	{
 		$scope.graph.$(":selected").remove();
+	}
+
+	
+
+	$scope.select = function(dir) //방향에 따라 선택해준다.
+	{
+
+		sub = function(a, b) {
+			return {x:(a.x - b.x ), y:(a.y-b.y)}
+		}
+
+		len = function( p ) {
+			return Math.sqrt(p.x*p.x + p.y*p.y);
+		}
+
+		normalize = function( p ){
+			var l = len(p);
+			return {x:(p.x/l), y:(p.y/l)};
+		}
+
+		dot = function(a, b){
+			return (a.x*b.x) + (a.y*b.y);
+		}
+
+
+		var selectedItem = $scope.graph.$(":selected");
+		if(selectedItem.length == 0)
+		{
+			console.log(selectedItem);
+			return;
+		}
+
+		//console.log(selectedItem);
+
+		var selectedItemPos = selectedItem.position();
+		var selectedItemData = selectedItem.data();
+		//console.log(selectedItemPos);
+
+		var found = $scope.graph.nodes().max(function(ele, idx, arr){
+
+			var data = ele.data();
+			var p = ele.position();
+			var j = ele.json();
+
+			if(data.id == selectedItemData.id){
+				//console.log(data.id, "pass");
+				return -1;
+			}
+
+			var v1 = dir;
+			var v2 = normalize(sub(p, selectedItemPos));
+			var dist = len(sub(selectedItemPos, p));
+			var weight = dot(v1,v2) / Math.sqrt(dist); //가까운거에 더 가중치를 준다.
+
+			//console.log(data.id, orth);
+			return weight;
+		})
+
+		//console.log(found);
+		if(found.value > 0) {
+			found.ele.select();
+			selectedItem.unselect();
+		}
+		//$scope.graph.nodes
 	}
 
 	$scope.editNode = function()

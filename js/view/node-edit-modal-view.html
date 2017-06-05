@@ -3,9 +3,8 @@
 </div>
 <div class="modal-body">
 	<div class="form-group">
-		<textarea class="form-control" rows="10" ng-model="item.content" ng-keydown="onKeyDown($event)" focus-me="opened"></textarea>
+		<textarea class="form-control" rows="10" ng-model="item.content" ng-keyup="onKeyUp($event)" focus-me="opened"></textarea>
 	</div>
-
 
 	Submit : <span class="label label-default">CTRL</span> + <span class="label label-default">Enter</span><br>
 	close : <span class="label label-default">ESC</span>
