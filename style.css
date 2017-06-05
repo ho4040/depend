@@ -1,4 +1,4 @@
-body { 
+body {
   font: 14px helvetica neue, helvetica, arial, sans-serif;
   position: absolute;
   width: 100%;
@@ -8,35 +8,32 @@ body {
   margin: 0;
   padding: 0;
 }
-
 .left-menu {
-  position:absolute;
-  width:200px;  
-  padding:20px;
-  top:0px;
-  height:100vh;
+  position: absolute;
+  width: 200px;
+  padding: 20px;
+  top: 0px;
+  height: 100vh;
 }
-
 .right-menu {
-  position:absolute;
-  right:0px;
-  top:0px;
-  bottom:0px;
-  width:400px;
-  height:100vh;
-  padding:20px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 400px;
+  height: 100vh;
+  padding: 20px;
 }
-
-.ngCytoscape{
-    position:absolute;
-    background-color:#f1f1f1;
-    border:2px solid #dddddd;
-    left: 200px;
-    top:0;    
-    right:400px;
-    bottom:0;
+.ngCytoscape {
+  position: absolute;
+  background-color: #f1f1f1;
+  border: 2px solid #dddddd;
+  left: 0px;
+  top: 0;
+  right: 400px;
+  bottom: 0;
 }
-
 .full-width {
-  width:100%;
+  width: 100%;
 }
+/*# sourceMappingURL=style.css.map */

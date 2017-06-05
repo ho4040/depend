@@ -8,55 +8,24 @@
 
 		<script src="bower_components/jquery/dist/jquery.js"></script>
 		<link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
-		<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-
-		<script src="bower_components/angular/angular.js"></script>
+		<!---<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script> -->
+		<script src="bower_components/angular/angular.js"></script>	
 		<script src="bower_components/cytoscape/dist/cytoscape.js"></script>
 		<script src="bower_components/ngCytoscape/ngCytoscape.js"></script>
+		<script src="bower_components/moment/moment.js"></script>
+		<script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js" ></script>
+
 
 		<link href="style.css" rel="stylesheet" />
 
 	</head>
 
-	<body ng-controller="MainCtrl">		
-	
-		<div class="left-menu">
-
-			<h1>DEPEND*</h1>
-
-			<h3>Layout</h3>
-			<div class="btn-group-vertical full-width">
-				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'circle', animate:true})">Circle</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'cose', animate:true})">Cose</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'breadthfirst', animate:true})">breadthfirst</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="updateLayout({name: 'grid', animate:true})">grid</button>
-			</div>
-
-			<h3>Node</h3>
-			<div class="btn-group-vertical full-width">
-				<button type="button" class="btn btn-default btn-xs" ng-click="onClickAddChild()">Add Child</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="onClickAddSibling()">Add Sibling</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="moveToUp()">up</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="moveToDown()">down</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="moveToLeft()">left</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="moveToRight()">right</button>
-				<button type="button" class="btn btn-default btn-xs" ng-click="remove()">remove</button>
-			</div>
-
-
-			<h3>Move</h3>
-			<div class="btn-group-vertical full-width">
-				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToUp()">Up</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToDown()">Down</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToLeft()">Left</button>
-				<button class="btn btn-raised btn-default btn-xs" ng-click="moveToRight()">Right</button>
-			</div>
-
-		</div>
+	<body ng-controller="MainCtrl" ng-keyup="onKeyUp($event)">		
 
 		<cytoscape  graph-elements="cy.elements" graph-layout="cy.layout" graph-style="cy.style" ></cytoscape>
 
 		<div class="right-menu">
+			<h1>Depend*</h1>
 			
 			<div class="form-group">
 				<label>이름</label>
@@ -68,6 +37,7 @@
 				<textarea class="form-control" ng-model="form.content" placeholder="contents" rows="10"></textarea>
 			</div>
 
+			<!--
 			<div class="form-group">
 				<label>링크</label>
 				<input class="form-control input-sm" type="text" ng-model="form.link" placeholder="http://"/>
@@ -84,27 +54,32 @@
 					</tbody>
 				</table>
 			</div>
+			-->
 
-			<div class="form-group">
-				<label>단축키</label>
-				<table class="table table-condensed table-bordered">
-					<tbody>
-						<tr><td>노드 추가</td><td>Ctrl+space</td></tr>
-						<tr><td>엣지 추가</td><td>Ctrl+e</td></tr>
-						<tr><td>노드 삭제</td><td>Delete</td></tr>
-						<tr><td>엣지 삭제</td><td>Ctrl+Delete</td></tr>
-						<tr><td>레이아웃변경</td><td>.</td></tr>
-						<tr><td>노드이동</td><td>방향키</td></tr>
-						<tr><td>내용수정</td><td>F2</td></tr>
-					</tbody>
-				</table>
+			<label>Keyboard short cuts</label>
+			<div style="padding-top:5px;">
+				Select : <span class="label label-default">Arrow key</span>
 			</div>
+			<div style="padding-top:5px;">
+				Insert : <span class="label label-default">Ctrl</span> + <span class="label label-default">Insert</span>
+			</div>
+			<div style="padding-top:5px;">
+				Edit : <span class="label label-default">Ctrl</span> + <span class="label label-default">Space</span>
+			</div>
+			<div style="padding-top:5px;">
+				Remove : <span class="label label-default">Delete</span>
+			</div>
+			
+			
 
 
 		</div>
 		
 	</body>
 
-	<script src="main.js"></script>
+	<script src="js/config.js"></script>
+	<script src="js/directives.js"></script>
+	<script src="js/ctrl/MainCtrl.js"></script>
+	<script src="js/ctrl/NodeEditModalCtrl.js"></script>
 
 </html>
