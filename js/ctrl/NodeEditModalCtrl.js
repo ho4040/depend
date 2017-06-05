@@ -6,8 +6,8 @@ app.controller("NodeEditModalCtrl", function($scope, $uibModalInstance, item, ti
 	};
 	$scope.lastKeyState = {};
 
-	$scope.onKeyDown = function(event) {
-
+	$scope.onKeyDown = function(event) 
+	{
 
 		var state = {
 				shift:event.shiftKey, 
@@ -23,8 +23,7 @@ app.controller("NodeEditModalCtrl", function($scope, $uibModalInstance, item, ti
 
 			if(!!state.ctrl && state.keyCode == 13) //ctrl + space
 			{
-				console.log('node-edit-modal on key up');
-				$uibModalInstance.close($scope.item);
+				$scope.submit();
 			}
 
 		}
@@ -33,6 +32,21 @@ app.controller("NodeEditModalCtrl", function($scope, $uibModalInstance, item, ti
 		
 	}
 
-	$scope.opened = true;
+	$scope.submit = function()
+	{	
+		if($scope.item.name == ""){
+			alert("please input node name.");
+			return;
+		}
+		console.log('node-edit-modal on key up');
+		$uibModalInstance.close($scope.item);
+	}
+
+	$scope.cancel = function()
+	{
+		$uibModalInstance.dismiss('cancel');	
+	}
+
+	$scope.bFocus = true;
 
 })

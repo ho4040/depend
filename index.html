@@ -20,21 +20,20 @@
 
 	</head>
 
-	<body ng-controller="MainCtrl" ng-keydown="onKeyDown($event)">		
+	<body ng-controller="MainCtrl" ng-keydown="onKeyDown($event)" ng-keyup="onKeyUp($event)">		
 
 		<cytoscape  graph-elements="cy.elements" graph-layout="cy.layout" graph-style="cy.style" ></cytoscape>
 
 		<div class="right-menu">
 			<h1>Depend*</h1>
-			
 			<div class="form-group">
 				<label>이름</label>
-				<input  class="form-control input-sm" type="text" ng-model="form.title" placeholder="title"/>
+				<input  class="form-control input-sm" type="text" ng-model="selected.data.name" placeholder="title"/>
 			</div>
 
 			<div class="form-group">
 				<label>내용</label>
-				<textarea class="form-control" ng-model="form.content" placeholder="contents" rows="10"></textarea>
+				<textarea class="form-control" ng-model="selected.data.content" placeholder="contents" rows="10"></textarea>
 			</div>
 
 			<!--

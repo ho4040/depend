@@ -1,4 +1,9 @@
-app.controller('MainCtrl', function($scope, $uibModal, cytoData){
+app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData){
+	
+	$scope.selected = {
+		element:null,
+		data: null
+	}
 
 	$scope.layoutState = {
 		list:[
@@ -11,7 +16,7 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 	}
 
-	$scope.lastKeyStae = {};
+	$scope.lastKeyState = {};
 
 	
 	$scope.modalInstance = null;
@@ -23,13 +28,13 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 
 	$scope.cy = {
-		elements:[
-			{ group:'nodes',data: { id: 'node1', name: 'root', content:"hello" }, selectable:true, selected:true },
-			/*{ group:'nodes',data: { id: 'node2', name: '2222'} },
+		/*elements:[
+			{ group:'nodes',data: { id: 'root', name: 'root', content:"hello" }, selectable:true, selected:true },
+			{ group:'nodes',data: { id: 'node2', name: '2222'} },
 			{ group:'nodes',data: { id: 'node3', name: '33333' } },
 			{ group:'edges',data: { id: 'link1', source:'node1', target:'node2' }},
-			{ group:'edges',data: { id: 'link2', source:'node2', target:'node3' }}*/
-		],
+			{ group:'edges',data: { id: 'link2', source:'node2', target:'node3' }}
+		],*/
 		style : [
 			{
 			 	selector: 'node',
@@ -69,12 +74,12 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 				keyCode:event.keyCode
 		}
 
-		if(JSON.stringify($scope.lastKeyStae) != JSON.stringify(state))
+		if(JSON.stringify($scope.lastKeyState) != JSON.stringify(state))
 		{
 			
-			$scope.lastKeyStae = state;
+			$scope.lastKeyState = state;
 
-			console.log("main-keyup", state);
+			//console.log("main-keyup", state);
 			if(!!state.ctrl && state.keyCode == 13) //ctrl + space
 			{
 				$scope.editNode();			
@@ -108,9 +113,10 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 				$scope.select({x:1,y:0});	
 			}
 		}
+	}
 
-		
-		
+	$scope.onKeyUp = function(event) {
+		$scope.lastKeyState = {}		
 	}
 
 	$scope.nextLayout = function()
@@ -118,7 +124,7 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 		$scope.layoutState.currentIndex = ($scope.layoutState.currentIndex+1) % $scope.layoutState.list.length;
 		var layout = $scope.layoutState.list[$scope.layoutState.currentIndex];
-		console.log("layout update", layout, $scope.layoutState.currentIndex);
+		//console.log("layout update", layout, $scope.layoutState.currentIndex);
 		
 		$scope.updateLayout(angular.copy(layout));
 	}
@@ -162,7 +168,7 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 		var selectedItem = $scope.graph.$(":selected");
 		if(selectedItem.length == 0)
 		{
-			console.log(selectedItem);
+			//console.log(selectedItem);
 			return;
 		}
 
@@ -194,8 +200,8 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 		//console.log(found);
 		if(found.value > 0) {
-			found.ele.select();
 			selectedItem.unselect();
+			found.ele.select();
 		}
 		//$scope.graph.nodes
 	}
@@ -206,13 +212,13 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 		//console.log(selectedNode);
 
 		$scope.modalInstance = $uibModal.open({
-			size:"lg",
+			size:"md",
 			backdrop:true,
 			templateUrl:"js/view/node-edit-modal-view.html",
 			controller:"NodeEditModalCtrl",
 			resolve:{
-				item:function(){ return data; },
-				title:function(){ return 'edit'; }
+				item:function(){ return angular.copy(data); },
+				title:function(){ return 'Edit'; }
 			}
 		});
 
@@ -221,6 +227,7 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 			//Add Node
 			console.log("edited");			
 			$scope.graph.$(":selected").data(resultData);
+			$scope.graph.forceRender();
 			$scope.modalInstance = null;
 
 		}, dismissed=>{
@@ -233,40 +240,55 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 
 	$scope.addNewNode = function()
 	{
-		
-		//console.log(selectedNode);
 
 		var newNodeId = 'n'+moment().format('YYYYMMDDHHmmss');
 		var newLinkId = 'l'+moment().format('YYYYMMDDHHmmss');
+		
+		var title = "";
+		var parent = $scope.graph.$(":selected");
+		if(parent.length == 0)
+		{
+			newNodeId = "root";
+			title = "Input final goal";
+		}
+		else
+		{
+			title = "Input Sub goal for achiveing " + parent.data().name;
+		}
 
 		$scope.modalInstance = $uibModal.open({
-			size:"lg",
+			size:"md",
 			backdrop:true,
 			templateUrl:"js/view/node-edit-modal-view.html",
 			controller:"NodeEditModalCtrl",
-			resolve:{
+			resolve:{				
 				item:function(){ 					
-					return {id:newNodeId, name:"new node", content:"empty content"}; 
+					return {id:newNodeId, name:"", content:""}; 
 				},
-				title:function(){ return 'Add node'; }
+				title:function(){ return 'Add node : ' +  title; }
 			}
 		});
 
 		$scope.modalInstance.result.then(resultData=>{
-
-			var parent = $scope.graph.$(":selected").data();
-
+			
+			var elements = [];
+			
 			var childNode = { group:'nodes',data: resultData, selectable:true, selected:true };
-			var edge = { group:'edges',data: { id: newLinkId, source:resultData.id, target:parent.id }}
+			elements.push(childNode);
+
+			if(parent.length > 0)
+			{
+				var parentData = parent.data();
+				var edge = { group:'edges',data: { id: newLinkId, source:resultData.id, target:parentData.id }};
+				elements.push(edge);
+
+				console.log("added");
+				$scope.graph.$(":selected").unselect();
+			}
 
 			//Add Node
-			console.log("added");
-
-			$scope.graph.$(":selected").unselect();
-			$scope.graph.add([childNode, edge]);
-
+			$scope.graph.add(elements);
 			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
-			
 			
 			$scope.modalInstance = null;
 
@@ -277,8 +299,17 @@ app.controller('MainCtrl', function($scope, $uibModal, cytoData){
 		})
 	}
 
+	$scope.$on('cy:node:select', function(event, data){
+		//event
+		//console.log(event, data);
+
+		$scope.selected.element = data.cyTarget;
+		$scope.selected.data = angular.copy(data.cyTarget.data());
+		/*$scope.$apply(function(){
 
 
+		});*/
+	})
 
 
 });
