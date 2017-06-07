@@ -1,5 +1,11 @@
-app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData){
-	
+app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Auth, $firebaseArray){
+
+	$scope.auth = Auth;
+	$scope.input = {},
+	$scope.firebaseUser = null;
+	$scope.authError = null;
+	$scope.currentDoc = null;
+
 	$scope.selected = {
 		element:null,
 		data: null
@@ -98,25 +104,23 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData){
 			}
 			else if(state.keyCode == 38) // up
 			{
-				$scope.select({x:0,y:-1});
+				$scope.selectWithDirection({x:0,y:-1});
 			}
 			else if(state.keyCode == 40) // down
 			{
-				$scope.select({x:0,y:1});
+				$scope.selectWithDirection({x:0,y:1});
 			}
 			else if(state.keyCode == 37) // left
 			{
-				$scope.select({x:-1,y:0});
+				$scope.selectWithDirection({x:-1,y:0});
 			}
 			else if(state.keyCode == 39) // right
 			{
-				$scope.select({x:1,y:0});	
+				$scope.selectWithDirection({x:1,y:0});	
 			}
 		}
-	}
 
-	$scope.onKeyUp = function(event) {
-		$scope.lastKeyState = {}		
+		event.stopPropagation();
 	}
 
 	$scope.nextLayout = function()
@@ -144,7 +148,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData){
 
 	
 
-	$scope.select = function(dir) //방향에 따라 선택해준다.
+	$scope.selectWithDirection = function(dir) //방향에 따라 선택해준다.
 	{
 
 		sub = function(a, b) {
@@ -299,16 +303,63 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData){
 		})
 	}
 
-	$scope.$on('cy:node:select', function(event, data){
-		//event
-		//console.log(event, data);
+	
 
+	$scope.loadDoc = function()
+	{
+		$uibModal.open({
+			size:"lg",
+			controller:"DocumentLoadModalCtrl",
+			templateUrl:"js/view/document-load-modal-view.html"
+		}).result.then(doc=>{
+			$scope.graph.elements().remove();
+			$scope.graph.add(doc.graph_eles);
+			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+		});
+	}
+
+	$scope.saveDoc = function()
+	{
+		var rootNode = $scope.graph.$("#root");
+		if(rootNode.length == 0)
+		{
+			alert("node is not exist");
+			return;
+		}
+
+		var rootName = rootNode.data().name;
+		var eles = $scope.graph.elements().jsons();
+
+		$uibModal.open({
+			size:"lg",
+			controller:"DocumentSaveModalCtrl",
+			templateUrl:"js/view/document-save-modal-view.html",
+			resolve:{
+				eles:function(){return eles;},
+				rootName:function(){ return rootName;}
+			}
+		});
+
+	}
+
+	
+	$scope.auth.$onAuthStateChanged(function(firebaseUser) {
+		$scope.firebaseUser = firebaseUser;
+	});
+
+	$scope.$on('cy:node:select', function(event, data){
+
+		//console.log("node selected!");
 		$scope.selected.element = data.cyTarget;
 		$scope.selected.data = angular.copy(data.cyTarget.data());
-		/*$scope.$apply(function(){
 
+		var phase = $scope.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest'){
+			//do nothing
+		}else{
+			$scope.$apply();
+		}
 
-		});*/
 	})
 
 
