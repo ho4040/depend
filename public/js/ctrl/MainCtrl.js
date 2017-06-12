@@ -60,7 +60,16 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 					'text-outline-width': 2,
 					'text-outline-color': '#09f'
 				}
+			},{
+				selector: 'edge',
+				style: {
+					'width': 3,
+					'line-color': '#ccc',
+					'target-arrow-color': '#ccc',
+					'target-arrow-shape': 'triangle'
+				}
 			}
+
 
 		],
 		layout : $scope.layoutState.list[$scope.layoutState.currentIndex],
@@ -337,7 +346,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			alert("Please login first.");
 			return;
 		}
-		
+
 		var rootNode = $scope.graph.$("#root");
 		if(rootNode.length == 0)
 		{
