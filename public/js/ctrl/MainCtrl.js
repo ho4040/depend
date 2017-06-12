@@ -144,6 +144,12 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	$scope.delete = function()
 	{
 		$scope.graph.$(":selected").remove();
+		
+		$scope.selected = {
+			element:null,
+			data: null
+		}
+
 	}
 
 	
@@ -277,7 +283,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			
 			var elements = [];
 			
-			var childNode = { group:'nodes',data: resultData, selectable:true, selected:true };
+			var childNode = { group:'nodes',data: resultData, selectable:true };
 			elements.push(childNode);
 
 			if(parent.length > 0)
@@ -293,6 +299,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			//Add Node
 			$scope.graph.add(elements);
 			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+			$scope.graph.nodes("#"+newNodeId).select();
 			
 			$scope.modalInstance = null;
 

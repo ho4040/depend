@@ -41,84 +41,50 @@
 		<div class="right-menu">
 
 
-			<div ng-show="firebaseUser" class="row" ng-cloak>
-				<span class="col-xs-6">
-					<h4>Depend*</h4>
-				</span>
-				<div class="col-xs-6 text-right">
-					Hello, {{ firebaseUser.displayName }} &nbsp;
-					<button class="btn btn-default btn-xs pull-right" ng-click="auth.$signOut()">Sign Out</button>
+			<div class="row" ng-cloak>
+				
+				<div class="col-xs-6">
+					<h3><label>Depend*</label></h3>
+				</div>
+				
+				<div ng-hide="firebaseUser" class="col-xs-6 text-right">
+					<button class="btn btn-default btn-xs pull-right" ng-click="auth.$signInWithPopup('google')">Sign In With Google</button>
 				</div>
 
-				<!-- <div class="col-xs-12" style="padding-top:10px;" ng-if="documents.length > 0">
-					<span class="input-group">
-						<select ng-model="input.selectedDocIdx" class="form-control">
-							<option ng-repeat="(k,doc) in documents" value="{{k}}">{{k}} {{doc.name}}</option>
-						</select>			
-						<span class="input-group-btn">
-							<button class="btn btn-default" ng-click="deleteDoc()">Delete</button>
-						</span>
-					</span>
-				</div> -->
-
-				<div class="btn-group btn-group-justified">
-					<a class="btn btn-default" ng-click="loadDoc()">Load</a>
-					<a class="btn btn-default" ng-click="saveDoc()">Save</a>
+				<div ng-show="firebaseUser" class="col-xs-6 text-right" >
+					<button class="btn btn-default btn-xs pull-right" ng-click="auth.$signOut()">{{firebaseUser.displayName}}, Sign Out</button>
 				</div>
 
-			</div>
-
-			<div ng-hide="firebaseUser" class="row" ng-cloak>
-				<span>Welcome, please sign in.</span>
-				<button class="btn btn-default btn-xs pull-right" ng-click="auth.$signInWithPopup('google')">Sign In With Google</button>
+				<div class="col-xs-12">
+					<div class="btn-group btn-group-justified" >
+						<a class="btn btn-default" ng-disabled="!firebaseUser" ng-click="loadDoc()">Load</a>
+						<a class="btn btn-default" ng-disabled="!firebaseUser" ng-click="saveDoc()">Save</a>
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="btn-group btn-group-justified" >
+						<a class="btn btn-default btn-sm" ng-click="addNewNode()">Add new</a>
+						<a class="btn btn-default btn-sm" ng-click="delete()" ng-disabled="!selected || !selected.data">Remove selected</a>
+						<a class="btn btn-default btn-sm" ng-click="nextLayout()">Change layout</a>
+					</div>
+				</div>
 			</div>
 
 
-			<!-- <div>
-				<div class="form-inline">
-					<input type="text" class="form-control" ng-model="currentDoc.name">
-					<button class="btn btn-default btn-xs pull-right" ng-click="documents.$add()">Save</button>
-					<button class="btn btn-default btn-xs pull-right" ng-click="documents.$save()">Save</button>
-				</div>
-			</div> -->
-			
-			<hr>
-
-			<div class="panel panel-default" >
+			<div class="panel panel-default" ng-if="!!selected && !!selected.data.name">
 				<div class="panel-heading">
-					항목 정보
+					<label>{{selected.data.name}}</label>
 				</div>
 				<div class="panel-body">
-					<div class="form-group">
-						<label>이름</label>
-						<input  class="form-control input-sm" type="text" ng-model="selected.data.name" placeholder="title"/>
-					</div>
-
-					<div class="form-group">
-						<label>내용</label>
-						<textarea class="form-control" ng-model="selected.data.content" placeholder="contents" rows="10"></textarea>
-					</div>
+					<p>{{selected.data.content}}</p>
+				</div>
+				<div class="panel-footer">
+					<button class="btn btn-default btn-xs" ng-click="editNode()">Edit</button>
 				</div>
 			</div>
 
-			<!--
-			<div class="form-group">
-				<label>링크</label>
-				<input class="form-control input-sm" type="text" ng-model="form.link" placeholder="http://"/>
-			</div>
+			<hr>
 
-			<div class="form-group">
-				<label>분석</label>
-				<table class="table table-condensed table-bordered">
-					<tbody>
-						<tr>
-							<td>의존도</td>
-							<td>N</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			-->
 
 			<label>Short cuts</label>
 			<div class="row" style="line-height: 1.5">
@@ -175,6 +141,7 @@
 
 			<hr>
 
+			<div style="position:absolute;bottom:10px;right:20px;" class="text-right"><a href="https://ho4040.github.io/depend/">Github project</a></div>
 			
 
 		</div>
