@@ -314,6 +314,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.loadDoc = function()
 	{
+		if(!$scope.firebaseUser)
+		{
+			alert("Please login first.");
+			return;
+		}
 		$uibModal.open({
 			size:"lg",
 			controller:"DocumentLoadModalCtrl",
@@ -327,6 +332,12 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.saveDoc = function()
 	{
+		if(!$scope.firebaseUser)
+		{
+			alert("Please login first.");
+			return;
+		}
+		
 		var rootNode = $scope.graph.$("#root");
 		if(rootNode.length == 0)
 		{

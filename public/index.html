@@ -71,16 +71,16 @@
 			</div>
 
 
-			<div class="panel panel-default" ng-if="!!selected && !!selected.data.name">
+			<div class="panel panel-default" ng-if="!!selected && !!selected.data.name" style="margin-top:30px;">
 				<div class="panel-heading">
 					<label>{{selected.data.name}}</label>
+					<button class="btn btn-default btn-xs pull-right" ng-click="editNode()">Edit</button>
 				</div>
 				<div class="panel-body">
-					<p>{{selected.data.content}}</p>
+					<pre>{{selected.data.content}}</pre>
 				</div>
-				<div class="panel-footer">
-					<button class="btn btn-default btn-xs" ng-click="editNode()">Edit</button>
-				</div>
+				<!-- <div class="panel-footer">
+				</div> -->
 			</div>
 
 			<hr>
