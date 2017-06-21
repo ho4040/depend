@@ -55,6 +55,11 @@
 					<button class="btn btn-default btn-xs pull-right" ng-click="auth.$signOut()">{{firebaseUser.displayName}}, Sign Out</button>
 				</div>
 
+				<div class="col-xs-12" ng-if="!!currentDoc">
+					<span>{{currentDoc.name}}</span>
+					<label class="pull-right"><input type="checkbox" ng-model="input.autoSave">auto save</label>
+				</div>
+
 				<div class="col-xs-12">
 					<div class="btn-group btn-group-justified" >
 						<a class="btn btn-default" ng-disabled="!firebaseUser" ng-click="loadDoc()">Load</a>

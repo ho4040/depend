@@ -17,7 +17,7 @@ app.controller("DocumentSaveModalCtrl", function($scope, $uibModalInstance, $fir
 		var doc = $scope.documents[idx];
 		doc.graph_eles = eles;
 		$scope.documents.$save(doc);
-		$uibModalInstance.close();
+		$uibModalInstance.close(doc);
 	}
 	
 
@@ -28,9 +28,9 @@ app.controller("DocumentSaveModalCtrl", function($scope, $uibModalInstance, $fir
 			alert("name required!");
 			return;
 		}
-
-		$scope.documents.$add({name:$scope.input.name, graph_eles:eles});
-		$uibModalInstance.close();
+		var doc = {name:$scope.input.name, graph_eles:eles};
+		$scope.documents.$add(doc);
+		$uibModalInstance.close(doc);
 	}
 
 })

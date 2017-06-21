@@ -1,6 +1,6 @@
-app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Auth, $firebaseArray){
+app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Auth, $timeout, $firebaseArray){
 
-	$scope.auth = Auth;
+	$scope.auth = Auth;	
 	$scope.input = {},
 	$scope.firebaseUser = null;
 	$scope.authError = null;
@@ -23,6 +23,8 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	}
 
 	$scope.lastKeyState = {};
+
+
 
 	
 	$scope.modalInstance = null;
@@ -307,7 +309,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 			//Add Node
 			$scope.graph.add(elements);
-			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+			//$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
 			$scope.graph.nodes("#"+newNodeId).select();
 			
 			$scope.modalInstance = null;
@@ -333,6 +335,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			controller:"DocumentLoadModalCtrl",
 			templateUrl:"js/view/document-load-modal-view.html"
 		}).result.then(doc=>{
+			$scope.currentDoc = doc;
 			$scope.graph.elements().remove();
 			$scope.graph.add(doc.graph_eles);
 			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
@@ -365,6 +368,8 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 				eles:function(){return eles;},
 				rootName:function(){ return rootName;}
 			}
+		}).result.then(doc=>{
+			$scope.currentDoc = doc;
 		});
 
 	}
@@ -372,6 +377,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	
 	$scope.auth.$onAuthStateChanged(function(firebaseUser) {
 		$scope.firebaseUser = firebaseUser;
+		$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
 	});
 
 	$scope.$on('cy:node:select', function(event, data){
@@ -389,6 +395,13 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	})
 
+	$scope.onTimer = function()
+	{
+		if(!!$scope.currentDoc && !!$scope.documents)
+			$scope.documents.$save($scope.currentDoc);
+	}
+
+	$timeout(onTimer, 1000);
 
 });
 
