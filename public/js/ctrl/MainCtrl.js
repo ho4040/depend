@@ -375,10 +375,21 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	}
 
 	
-	$scope.auth.$onAuthStateChanged(function(firebaseUser) {
-		$scope.firebaseUser = firebaseUser;
-		var ref = firebase.database().ref();
-		$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
+	$scope.auth.$onAuthStateChanged(function(firebaseUser)
+	{
+		if( !!firebaseUser )
+		{
+			$scope.firebaseUser = firebaseUser;
+			var ref = firebase.database().ref();
+			$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
+			console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
+		}
+		else
+		{
+			$scope.firebaseUser = null;
+			$scope.documents = null;			
+			console.log("logout");
+		}
 	});
 
 	$scope.$on('cy:node:select', function(event, data){
@@ -400,15 +411,18 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	{
 		if(!!$scope.input.autoSave && !!$scope.currentDoc && !!$scope.documents)
 		{
-			var eles = $scope.graph.elements().jsons();
-			$scope.currentDoc.graph_eles = eles;
-			$scope.documents.$save($scope.currentDoc);
-			console.log("saved!!", $scope.currentDoc);
+			$scope.currentDoc.graph_eles = $scope.graph.elements().jsons();
+			$scope.documents.$save($scope.currentDoc).then(e=>{
+				console.log("saved!!", e, $scope.currentDoc);
+			}, f=>{
+				console.log("saved failed", f, $scope.currentDoc);
+			})
 		}
-		$timeout($scope.onTimer, 3000);
+
+		$timeout($scope.onTimer, 4000);
 	}
 
-	$timeout($scope.onTimer, 3000);
+	$timeout($scope.onTimer, 4000);
 
 });
 

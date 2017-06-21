@@ -30,11 +30,26 @@
 			};
 			firebase.initializeApp(config);
 		</script>
+
+
+
+
 		<link href="style.css" rel="stylesheet" />
 
 	</head>
 
 	<body ng-controller="MainCtrl" ng-keydown="onKeyDown($event)" ng-keyup="onKeyUp($event)">		
+
+
+		<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=647551065449160";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
 
 		<cytoscape  graph-elements="cy.elements" graph-layout="cy.layout" graph-style="cy.style" ></cytoscape>
 
@@ -145,6 +160,8 @@
 			</div>
 
 			<hr>
+
+			<div class="fb-comments" data-href="http://depend.nooslab.com" data-width="360" data-numposts="3"></div>
 
 			<div style="position:absolute;bottom:10px;right:20px;" class="text-right"><a href="https://github.com/ho4040/depend">Github project</a></div>
 			
