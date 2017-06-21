@@ -377,6 +377,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	
 	$scope.auth.$onAuthStateChanged(function(firebaseUser) {
 		$scope.firebaseUser = firebaseUser;
+		var ref = firebase.database().ref();
 		$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
 	});
 
@@ -397,11 +398,17 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.onTimer = function()
 	{
-		if(!!$scope.currentDoc && !!$scope.documents)
+		if(!!$scope.input.autoSave && !!$scope.currentDoc && !!$scope.documents)
+		{
+			var eles = $scope.graph.elements().jsons();
+			$scope.currentDoc.graph_eles = eles;
 			$scope.documents.$save($scope.currentDoc);
+			console.log("saved!!", $scope.currentDoc);
+		}
+		$timeout($scope.onTimer, 3000);
 	}
 
-	$timeout(onTimer, 1000);
+	$timeout($scope.onTimer, 3000);
 
 });
 
