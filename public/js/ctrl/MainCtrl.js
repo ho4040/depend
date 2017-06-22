@@ -282,10 +282,15 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			title = "Input Sub goal for achiveing " + parent.data().name;
 		}
 
-		var parentPos = parent.position();
-		var theta = Math.random() * Math.PI * 2;
-		var r =100;
-		var newPos = {x:parentPos.x+Math.cos(theta)*r, y:parentPos.y+Math.sin(theta)*r};
+		newPos = {x:0, y:0};
+		
+		if(!!parent)
+		{
+			var parentPos = parent.position();
+			var theta = Math.random() * Math.PI * 2;
+			var r =100;
+			newPos = {x:parentPos.x+Math.cos(theta)*r, y:parentPos.y+Math.sin(theta)*r};
+		}
 
 		$scope.modalInstance = $uibModal.open({
 			size:"md",
