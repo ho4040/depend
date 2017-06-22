@@ -1,7 +1,9 @@
 app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Auth, $timeout, $firebaseArray){
 
 	$scope.auth = Auth;	
-	$scope.input = {},
+	$scope.input = {
+		autoSave: true
+	},
 	$scope.lastSavedDataHash = "";
 	$scope.firebaseUser = null;
 	$scope.authError = null;
@@ -145,9 +147,10 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 		event.stopPropagation();
 	}
-	
+
 	$scope.updateLayout = function(layout)
 	{	
+		$scope.onUpdate();
 		var layout = $scope.graph.makeLayout({name:'cose', animate:true});
 		layout.run();
 	}
@@ -279,6 +282,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			title = "Input Sub goal for achiveing " + parent.data().name;
 		}
 
+		var parentPos = parent.position();
+		var theta = Math.random() * Math.PI * 2;
+		var r =100;
+		var newPos = {x:parentPos.x+Math.cos(theta)*r, y:parentPos.y+Math.sin(theta)*r};
+
 		$scope.modalInstance = $uibModal.open({
 			size:"md",
 			backdrop:true,
@@ -296,7 +304,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			
 			var elements = [];
 			resultData.size=10;
-			var childNode = { group:'nodes',data: resultData, selectable:true };
+			var childNode = { group:'nodes', data: resultData, selectable:true, position:newPos };
 			elements.push(childNode);
 
 			if(parent.length > 0)
@@ -359,7 +367,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	{
 		if(!$scope.firebaseUser)
 		{
-			alert("Please login first.");
+			alert("Please sign in first.");
 			return;
 		}
 		$uibModal.open({
@@ -373,7 +381,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	{
 		if(!$scope.firebaseUser)
 		{
-			alert("Please login first.");
+			alert("Please sign in first.");
 			return;
 		}
 
@@ -434,11 +442,16 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	$scope.auth.$onAuthStateChanged(function(firebaseUser)
 	{
 		if( !!firebaseUser )
-		{
+		{	
+			var justLogin = false;
+			if($scope.firebaseUser == null)
+				justLogin = true;
 			$scope.firebaseUser = firebaseUser;
 			var ref = firebase.database().ref();
 			$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
 			//console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
+			if(justLogin)
+				$scope.loadDoc();
 		}
 		else
 		{

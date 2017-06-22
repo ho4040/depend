@@ -95,7 +95,7 @@
 
 					<div class="row" >
 						<div class="col-xs-12" >
-							<h4>
+							<h5>
 								<label>
 									<i class="glyphicon glyphicon-log-in"></i>
 									Input
@@ -103,13 +103,13 @@
 								<button class="btn btn-xs btn-default pull-right" ng-click="changeInput(selected, output)">
 									<i class="glyphicon glyphicon-pencil"></i>
 								</button>
-							</h4>
+							</h5>
 							<ul ng-if="selected.inputs.length > 0">
 								<li  ng-repeat="target in selected.inputs">{{target.name}}</li>
 							</ul>
 						</div>
 						<div class="col-xs-12" >
-							<h4>
+							<h5>
 								<label>
 									<i class="glyphicon glyphicon-log-out"></i>
 									Output
@@ -117,7 +117,7 @@
 								<button class="btn btn-xs btn-default pull-right" ng-click="changeOutput(selected, output)">
 									<i class="glyphicon glyphicon-pencil"></i>
 								</button>
-							</h4>
+							</h5>
 							<ul ng-if="selected.outputs.length > 0">
 								<li ng-repeat="output in selected.outputs">{{output.name}}</li>
 							</ul>
