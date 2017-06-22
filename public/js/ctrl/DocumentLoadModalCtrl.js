@@ -4,31 +4,33 @@ app.controller("DocumentLoadModalCtrl", function($scope, $uibModalInstance, $fir
 
 	$scope.reload = function()
 	{
-
 		console.log($scope.firebaseUser.uid)
 		var ref = firebase.database().ref();
 		$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
 
 	}
 
-	$scope.onClickLoad = function(idx)
+	$scope.onClickLoad = function(doc)
 	{
-		$uibModalInstance.close($scope.documents[idx]);
+		$uibModalInstance.close(doc.$id);
 	}
 
 	$scope.onClickDelete = function(doc)
 	{
-		if(prompt("Delete document. are you sure?"))
+		if(confirm("Delete document '"+doc.name+"' are you sure?"))
 		{
-			$scope.documents.$remove(index);
+			$scope.documents.$remove(doc);
 		}
 	}
 
 	$scope.auth = Auth;
 	$scope.auth.$onAuthStateChanged(function(firebaseUser)
 	{
-		$scope.firebaseUser = firebaseUser;
-		$scope.reload();
+		if(firebaseUser)
+		{
+			$scope.firebaseUser = firebaseUser;
+			$scope.reload();
+		}
 	});
 
 	

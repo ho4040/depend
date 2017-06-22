@@ -10,12 +10,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="doc in documents track by $index">
+			<tr ng-repeat="doc in documents">
 				<td>
 					{{doc.name}}
 				</td>
-				<td class="text-center" style="width:100px;">
-					<button class="btn btn-xs btn-warning" ng-click="onClickLoad($index)">Load</button>
+				<td class="text-center" style="width:120px;">
+					<button class="btn btn-xs btn-warning" ng-click="onClickLoad(doc)">Load</button>
+					<button class="btn btn-xs btn-danger" ng-click="onClickDelete(doc)">Delete</button>
 				</td>
 			</tr>
 		</tbody>

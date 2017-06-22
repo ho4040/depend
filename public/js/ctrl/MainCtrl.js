@@ -321,7 +321,18 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		})
 	}
 
-	
+	$scope.reloadDoc = function(objId)
+	{
+		var uid = $scope.firebaseUser.uid;
+		var path  = "/user_data/"+uid+"/documents/"+objId;
+		$scope.docRef = firebase.database().ref(path);
+		$scope.docRef.once('value').then(function(snapshot){
+			$scope.currentDoc = snapshot.val();
+			$scope.graph.elements().remove();
+			$scope.graph.add($scope.currentDoc.graph_eles);
+			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+		});
+	}
 
 	$scope.loadDoc = function()
 	{
@@ -334,12 +345,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			size:"lg",
 			controller:"DocumentLoadModalCtrl",
 			templateUrl:"js/view/document-load-modal-view.html"
-		}).result.then(doc=>{
-			$scope.currentDoc = doc;
-			$scope.graph.elements().remove();
-			$scope.graph.add(doc.graph_eles);
-			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
-		});
+		}).result.then($scope.reloadDoc);
 	}
 
 	$scope.saveDoc = function()
@@ -368,8 +374,37 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 				eles:function(){return eles;},
 				rootName:function(){ return rootName;}
 			}
-		}).result.then(doc=>{
-			$scope.currentDoc = doc;
+		}).result.then($scope.reloadDoc);
+
+	}
+
+	$scope.editCode = function()
+	{
+		var original_eles = $scope.graph.elements().jsons();
+
+		$uibModal.open({
+			size:"lg",
+			controller:"CodeEditModalCtrl",
+			templateUrl:"js/view/code-edit-modal-view.html",
+			resolve:{
+				eles:function(){
+					return angular.copy(original_eles);
+				}
+			}
+		}).result.then(eles=>{
+			try
+			{
+				$scope.graph.elements().remove();
+				$scope.graph.add(eles);
+				$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+			}
+			catch(e)
+			{
+				alert("code have error!");
+				$scope.graph.elements().remove();
+				$scope.graph.add(original_eles);
+				$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+			}
 		});
 
 	}
@@ -382,7 +417,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			$scope.firebaseUser = firebaseUser;
 			var ref = firebase.database().ref();
 			$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
-			console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
+			//console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
 		}
 		else
 		{
@@ -409,13 +444,13 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.onTimer = function()
 	{
-		if(!!$scope.input.autoSave && !!$scope.currentDoc && !!$scope.documents)
+		if(!!$scope.input.autoSave && !!$scope.docRef)
 		{
-			$scope.currentDoc.graph_eles = $scope.graph.elements().jsons();
-			$scope.documents.$save($scope.currentDoc).then(e=>{
-				console.log("saved!!", e, $scope.currentDoc);
+			var eles = $scope.graph.elements().jsons();
+			$scope.docRef.update({graph_eles:eles}).then(e=>{
+				console.log("saved!!");
 			}, f=>{
-				console.log("saved failed", f, $scope.currentDoc);
+				console.log("saved failed", f);
 			})
 		}
 

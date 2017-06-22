@@ -1,8 +1,8 @@
 <div class="modal-header">
-	저장하기
+	Save document
 </div>
 <div class="modal-body">
-	<table class="table table-bordered" ng-if="!!firebaseUser">
+	<table class="table table-bordered" ng-if="!!firebaseUser && !saving">
 		<tr ng-repeat="doc in documents track by $index">
 			<td>
 				{{doc.name}}
@@ -20,4 +20,7 @@
 			</td>
 		</tr>
 	</table>
+	<div class="jumbotron text-center" ng-show="!!saving">
+		<label><p class="text-lead">..saving..</p></label>
+	</div>
 </div>
