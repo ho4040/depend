@@ -1,12 +1,17 @@
-app.controller("NodeSelectModalCtrl", function($scope, $uibModalInstance, nodes, selectedNode){
+app.controller("NodeSelectModalCtrl", function($scope, $uibModalInstance, title, nodes){
 
+	$scope.title = title;
 	$scope.nodes = nodes;
-	$scope.selectedNode = selectedNode;
 
-	console.log(nodes, selectedNode);
-
-	$scope.onClick = function(node){
-		$uibModalInstance.close(node);
+	$scope.submit = function(){
+		var selectedNodes = $scope.nodes.filter(e=>{
+			return !!e.selected;
+		});
+		$uibModalInstance.close(selectedNodes);
+	}
+	$scope.cancel = function()
+	{
+		$uibModalInstance.dismiss();
 	}
 	
 })

@@ -14,8 +14,8 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	$scope.layoutState = {
 		list:[
 			{name: 'cose', animate:true},
-			{name: 'circle', animate:true},
-			{name: 'breadthfirst', animate:true},
+			/*{name: 'circle', animate:true},
+			{name: 'breadthfirst', animate:true},*/
 			{name: 'grid', animate:true}
 		],
 		currentIndex:0
@@ -67,8 +67,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 				style: {
 					'width': 3,
 					'line-color': '#ccc',
-					'target-arrow-color': '#ccc',
-					'target-arrow-shape': 'triangle'
+					'curve-style': 'unbundled-bezier',
+					'target-arrow-color': '#09f',
+					'target-arrow-shape': 'triangle',
+					'source-arrow-color': '#888',
+					'source-arrow-shape': 'circle'
 				}
 			}
 
@@ -325,9 +328,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		$scope.graph.edges(selector).remove();
 	}
 
-	$scope.newEdge = function(sourceId, targetId)
+	$scope.newEdge = function(sourceId, targetId, index=0)
 	{
 		var newLinkId = 'l'+moment().format('YYYYMMDDHHmmss');
+		if(index != 0)
+			newLinkId += index;
 		return { group:'edges', data: { id: newLinkId, source:sourceId, target:targetId }};
 	}
 
@@ -437,37 +442,76 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		}
 	});
 
-	$scope.changeOutput = function(selected, current_output)
+	$scope.changeOutput = function(selected)
 	{
 		$uibModal.open({
 			size:"md",
 			backdrop:true,
 			templateUrl:"js/view/node-select-modal-view.html",
 			controller:"NodeSelectModalCtrl",
-			resolve:{				
+			resolve:{
+				title:function()
+				{
+					return "Edit output of "+selected.data.name;
+				},
 				nodes:function()
 				{
-					return $scope.graph.nodes().map(ele=>{return ele.data()});
-				},
-				selectedNode:function()
-				{
-					return angular.copy(current_output);
+					var targets = $scope.graph.edges("[source='"+selected.data.id+"']").map(e=>{return e.data().target;});
+					return $scope.graph.nodes("[id!='"+selected.data.id+"']").map(ele=>{
+						var data = ele.data();
+						var nodeId = ele.data("id");
+						data.selected = targets.indexOf(nodeId) != -1;
+						return data;
+					});
 				}
 			}
-		}).result.then(e=>{
-			$scope.removeEdge(selected.data.id, current_output.id);
-			$scope.graph.add([$scope.newEdge(selected.data.id, e.id)]);
+		}).result.then(nodes=>{
+			$scope.graph.edges("[source='"+selected.data.id+"']").remove();
+			var edges = nodes.map((node,idx)=>{
+				return $scope.newEdge(selected.data.id, node.id, idx);
+			})
+			$scope.graph.add(edges);
+			$scope.onUpdate();
 		})
 	}
 
-	$scope.$on('cy:node:select', function(event, data){
+	$scope.changeInput = function(selected)
+	{
+		$uibModal.open({
+			size:"md",
+			backdrop:true,
+			templateUrl:"js/view/node-select-modal-view.html",
+			controller:"NodeSelectModalCtrl",
+			resolve:{
+				title:function()
+				{
+					return "Edit input of "+selected.data.name;
+				},
+				nodes:function()
+				{
+					var sources = $scope.graph.edges("[target='"+selected.data.id+"']").map(e=>{return e.data().source;});
+					return $scope.graph.nodes("[id!='"+selected.data.id+"']").map(ele=>{
+						var data = ele.data();
+						var nodeId = ele.data("id");
+						data.selected = sources.indexOf(nodeId) != -1;
+						return data;
+					});
+				}
+			}
+		}).result.then(nodes=>{
+			$scope.graph.edges("[target='"+selected.data.id+"']").remove();
+			var edges = nodes.map((node,idx)=>{
+				return $scope.newEdge(node.id, selected.data.id, idx);
+			})
+			$scope.graph.add(edges);
+			$scope.onUpdate();
+		})
+	}
 
-		//console.log("node selected!");
-		$scope.selected.element = data.cyTarget;
-		$scope.selected.data = angular.copy(data.cyTarget.data());
-		
-		// Update linked node info
-		var nodeId = data.cyTarget.data("id");
+	$scope.onUpdate = function(ele) {
+
+		// Update linked node info		
+		var nodeId = $scope.selected.data.id;
 		var source_edges = $scope.graph.edges("[source='"+nodeId+"']");
 		var target_edges = $scope.graph.edges("[target='"+nodeId+"']");
 
@@ -483,6 +527,15 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			$scope.selected.inputs = $scope.graph.$(target_node_ids).map(ele=>{ return ele.data()});
 		else
 			$scope.selected.inputs = [];
+
+	}
+
+	$scope.$on('cy:node:select', function(event, data){
+
+		//console.log("node selected!");
+		$scope.selected.element = data.cyTarget;
+		$scope.selected.data = angular.copy(data.cyTarget.data());
+		$scope.onUpdate();		
 
 		var phase = $scope.$root.$$phase;
 		if(phase == '$apply' || phase == '$digest'){

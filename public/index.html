@@ -84,7 +84,7 @@
 			</div>
 
 
-			<div class="panel panel-default" ng-if="!!selected && !!selected.data.name" style="margin-top:30px;">
+			<div class="panel panel-default" ng-if="!!selected && !!selected.data.name" style="margin-top:30px;" ng-cloak>
 				<div class="panel-heading">
 					<label>{{selected.data.name}}</label>
 					<button class="btn btn-default btn-xs pull-right" ng-click="editNode()">Edit</button>
@@ -93,22 +93,34 @@
 					<pre ng-if="!!selected.data.content">{{selected.data.content}}</pre>
 					<pre ng-if="!selected.data.content">..Empty..</pre>
 
-					<div class="row" ng-if="selected.inputs.length > 0">
+					<div class="row" >
 						<div class="col-xs-12" >
-							<label><h4>Input</h4></label>
+							<h4>
+								<label>
+									<i class="glyphicon glyphicon-log-in"></i>
+									Input
+								</label>
+								<button class="btn btn-xs btn-default pull-right" ng-click="changeInput(selected, output)">
+									<i class="glyphicon glyphicon-pencil"></i>
+								</button>
+							</h4>
+							<ul ng-if="selected.inputs.length > 0">
+								<li  ng-repeat="target in selected.inputs">{{target.name}}</li>
+							</ul>
 						</div>
-						<div class="col-xs-12" ng-repeat="target in selected.inputs">
-							{{target.name}}
-						</div>
-					</div>
-
-					<div class="row" ng-if="selected.outputs.length > 0">
 						<div class="col-xs-12" >
-							<label><h4>Output</h4></label>
-						</div>
-						<div class="col-xs-12" ng-repeat="output in selected.outputs">
-							{{output.name}}
-							<button class="btn btn-xs btn-default" ng-click="changeOutput(selected, output)">...</button>
+							<h4>
+								<label>
+									<i class="glyphicon glyphicon-log-out"></i>
+									Output
+								</label>
+								<button class="btn btn-xs btn-default pull-right" ng-click="changeOutput(selected, output)">
+									<i class="glyphicon glyphicon-pencil"></i>
+								</button>
+							</h4>
+							<ul ng-if="selected.outputs.length > 0">
+								<li ng-repeat="output in selected.outputs">{{output.name}}</li>
+							</ul>
 						</div>
 					</div>
 				</div>				
