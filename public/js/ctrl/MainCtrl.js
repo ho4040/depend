@@ -432,6 +432,24 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		//console.log("node selected!");
 		$scope.selected.element = data.cyTarget;
 		$scope.selected.data = angular.copy(data.cyTarget.data());
+		
+		// Update linked node info
+		var nodeId = data.cyTarget.data("id");
+		var source_edges = $scope.graph.edges("[source='"+nodeId+"']");
+		var target_edges = $scope.graph.edges("[target='"+nodeId+"']");
+
+		var source_node_ids = source_edges.map(ele=>{return ele.data('target');}).map(id=>{ return "#"+id;}).join(",");
+		var target_node_ids = target_edges.map(ele=>{return ele.data('source');}).map(id=>{ return "#"+id;}).join(",");
+
+		if(!!source_node_ids)
+			$scope.selected.outputs = $scope.graph.$(source_node_ids).map(ele=>{ return ele.data()});
+		else
+			$scope.selected.outputs = [];
+
+		if(!!target_node_ids)
+			$scope.selected.inputs = $scope.graph.$(target_node_ids).map(ele=>{ return ele.data()});
+		else
+			$scope.selected.inputs = [];
 
 		var phase = $scope.$root.$$phase;
 		if(phase == '$apply' || phase == '$digest'){

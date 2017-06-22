@@ -90,10 +90,27 @@
 					<button class="btn btn-default btn-xs pull-right" ng-click="editNode()">Edit</button>
 				</div>
 				<div class="panel-body">
-					<pre>{{selected.data.content}}</pre>
-				</div>
-				<!-- <div class="panel-footer">
-				</div> -->
+					<pre ng-if="!!selected.data.content">{{selected.data.content}}</pre>
+					<pre ng-if="!selected.data.content">..Empty..</pre>
+
+					<div class="row" ng-if="selected.inputs.length > 0">
+						<div class="col-xs-12" >
+							<label><h4>Input</h4></label>
+						</div>
+						<div class="col-xs-12" ng-repeat="target in selected.inputs">
+							{{target.name}}
+						</div>
+					</div>
+
+					<div class="row" ng-if="selected.outputs.length > 0">
+						<div class="col-xs-12" >
+							<label><h4>Output</h4></label>
+						</div>
+						<div class="col-xs-12" ng-repeat="src in selected.outputs">
+							{{src.name}}
+						</div>
+					</div>
+				</div>				
 			</div>
 
 			<hr>
