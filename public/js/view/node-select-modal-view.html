@@ -1,0 +1,13 @@
+<div class="modal-header">
+	Select node
+</div>
+<div class="modal-body">
+	<!-- {{selectedNode}} -->
+	<table class="table table-hover table-bordered">
+		<tr ng-repeat="node in nodes track by $index" style="cursor:pointer;" ng-click="onClick(node)" ng-class="{'bg-info':(node.id == selectedNode.id)}">
+			<td>
+				<!-- {{node.id}} :  -->{{node.name}}
+			</td>
+		</tr>
+	</table>
+</div>

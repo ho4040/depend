@@ -300,10 +300,8 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			if(parent.length > 0)
 			{
 				var parentData = parent.data();
-				var edge = { group:'edges',data: { id: newLinkId, source:resultData.id, target:parentData.id }};
+				var edge = $scope.newEdge(resultData.id, parentData.id);
 				elements.push(edge);
-
-				console.log("added");
 				$scope.graph.$(":selected").unselect();
 			}
 
@@ -319,6 +317,18 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			$scope.modalInstance = null;
 
 		})
+	}
+
+	$scope.removeEdge = function(sourceId, targetId)
+	{
+		var selector = "[target='"+targetId+"'][source='"+sourceId+"']";
+		$scope.graph.edges(selector).remove();
+	}
+
+	$scope.newEdge = function(sourceId, targetId)
+	{
+		var newLinkId = 'l'+moment().format('YYYYMMDDHHmmss');
+		return { group:'edges', data: { id: newLinkId, source:sourceId, target:targetId }};
 	}
 
 	$scope.reloadDoc = function(objId)
@@ -427,6 +437,29 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		}
 	});
 
+	$scope.changeOutput = function(selected, current_output)
+	{
+		$uibModal.open({
+			size:"md",
+			backdrop:true,
+			templateUrl:"js/view/node-select-modal-view.html",
+			controller:"NodeSelectModalCtrl",
+			resolve:{				
+				nodes:function()
+				{
+					return $scope.graph.nodes().map(ele=>{return ele.data()});
+				},
+				selectedNode:function()
+				{
+					return angular.copy(current_output);
+				}
+			}
+		}).result.then(e=>{
+			$scope.removeEdge(selected.data.id, current_output.id);
+			$scope.graph.add([$scope.newEdge(selected.data.id, e.id)]);
+		})
+	}
+
 	$scope.$on('cy:node:select', function(event, data){
 
 		//console.log("node selected!");
@@ -462,20 +495,29 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.onTimer = function()
 	{
-		if(!!$scope.input.autoSave && !!$scope.docRef)
+
+		if(!!$scope.input.autoSave && !!$scope.docRef && !$scope.saving)
 		{
-			var eles = $scope.graph.elements().jsons();
-			$scope.docRef.update({graph_eles:eles}).then(e=>{
+			$scope.saving == true;
+			var eles = angular.copy($scope.graph.elements().jsons()).map(e=>{
+				if('$$hash' in e.data)
+					delete e.data["$$hash"];
+				return e;
+			});
+			//console.log(eles);
+			$scope.docRef.set({ name:$scope.currentDoc.name, graph_eles:eles}).then(e=>{
 				console.log("saved!!");
+				$scope.saving == false;
 			}, f=>{
 				console.log("saved failed", f);
+				$scope.saving == false;
 			})
 		}
 
-		$timeout($scope.onTimer, 4000);
+		$timeout($scope.onTimer, 2000);
 	}
 
-	$timeout($scope.onTimer, 4000);
+	$timeout($scope.onTimer, 2000);
 
 });
 
