@@ -2,6 +2,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.auth = Auth;	
 	$scope.input = {},
+	$scope.lastSavedDataHash = "";
 	$scope.firebaseUser = null;
 	$scope.authError = null;
 	$scope.currentDoc = null;
@@ -16,7 +17,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			{name: 'cose', animate:true},
 			/*{name: 'circle', animate:true},
 			{name: 'breadthfirst', animate:true},*/
-			{name: 'grid', animate:true}
+			/*{name: 'grid', animate:true}*/
 		],
 		currentIndex:0
 
@@ -49,20 +50,28 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 				style: {
 					'content': 'data(name)',
 					'text-valign': 'center',
+					'width': 'data(size)',
+					'height': 'data(size)',
 					'color': 'white',
 					'text-outline-width': 2,
-					'text-outline-color': '#888'
+					'text-outline-color': '#888',
+					'background-color':'#888'
 				}
-			},{
+			},
+			{
 				selector: ':selected',
 				style: {
 					'content': 'data(name)',
 					'text-valign': 'center',
 					'color': 'white',
 					'text-outline-width': 2,
-					'text-outline-color': '#09f'
+					'text-outline-color': '#09f',
+					'background-color':'#555',
+					'border-width':4,
+					'border-color':'#09f',
 				}
-			},{
+			},
+			{
 				selector: 'edge',
 				style: {
 					'width': 3,
@@ -110,7 +119,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			}	
 			else if(!!state.ctrl && state.keyCode == 190) //ctrl+.
 			{
-				$scope.nextLayout();
+				$scope.updateLayout();
 			}
 			else if(state.keyCode == 46) // delete
 			{
@@ -136,23 +145,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 		event.stopPropagation();
 	}
-
-	$scope.nextLayout = function()
-	{
-
-		$scope.layoutState.currentIndex = ($scope.layoutState.currentIndex+1) % $scope.layoutState.list.length;
-		var layout = $scope.layoutState.list[$scope.layoutState.currentIndex];
-		//console.log("layout update", layout, $scope.layoutState.currentIndex);
-		
-		$scope.updateLayout(angular.copy(layout));
-	}
-
+	
 	$scope.updateLayout = function(layout)
 	{	
-		if(!!layout)
-			$scope.cy.layout = layout;
-		else
-			$scope.cy.layout = angular.copy($scope.cy.layout);
+		var layout = $scope.graph.makeLayout({name:'cose', animate:true});
+		layout.run();
 	}
 
 	$scope.delete = function()
@@ -163,6 +160,8 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			element:null,
 			data: null
 		}
+
+		$scope.onUpdate();
 
 	}
 
@@ -296,7 +295,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		$scope.modalInstance.result.then(resultData=>{
 			
 			var elements = [];
-			
+			resultData.size=10;
 			var childNode = { group:'nodes',data: resultData, selectable:true };
 			elements.push(childNode);
 
@@ -312,7 +311,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			$scope.graph.add(elements);
 			//$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
 			$scope.graph.nodes("#"+newNodeId).select();
-			
+			$scope.onUpdate();
 			$scope.modalInstance = null;
 
 		}, dismissed=>{
@@ -326,6 +325,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	{
 		var selector = "[target='"+targetId+"'][source='"+sourceId+"']";
 		$scope.graph.edges(selector).remove();
+		$scope.onUpdate();
 	}
 
 	$scope.newEdge = function(sourceId, targetId, index=0)
@@ -342,10 +342,16 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		var path  = "/user_data/"+uid+"/documents/"+objId;
 		$scope.docRef = firebase.database().ref(path);
 		$scope.docRef.once('value').then(function(snapshot){
-			$scope.currentDoc = snapshot.val();
 			$scope.graph.elements().remove();
-			$scope.graph.add($scope.currentDoc.graph_eles);
-			$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
+			$scope.currentDoc = snapshot.val();
+			console.log($scope.currentDoc);
+			$scope.graph.add($scope.currentDoc.graph_eles.map(e=>{
+				if('size' in e.data == false)
+					e.data.size = 40;
+				return e;
+			}));
+			$scope.onUpdate();
+			$scope.graph.$(":visible").layout($scope.layoutState.list[0]);
 		});
 	}
 
@@ -508,26 +514,48 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		})
 	}
 
-	$scope.onUpdate = function(ele) {
+	$scope.onUpdate = function() {
 
 		// Update linked node info		
-		var nodeId = $scope.selected.data.id;
-		var source_edges = $scope.graph.edges("[source='"+nodeId+"']");
-		var target_edges = $scope.graph.edges("[target='"+nodeId+"']");
+		if(!!$scope.selected && !!$scope.selected.data)
+		{
+			var nodeId = $scope.selected.data.id;
+			var source_edges = $scope.graph.edges("[source='"+nodeId+"']");
+			var target_edges = $scope.graph.edges("[target='"+nodeId+"']");
 
-		var source_node_ids = source_edges.map(ele=>{return ele.data('target');}).map(id=>{ return "#"+id;}).join(",");
-		var target_node_ids = target_edges.map(ele=>{return ele.data('source');}).map(id=>{ return "#"+id;}).join(",");
+			var source_node_ids = source_edges.map(ele=>{return ele.data('target');}).map(id=>{ return "#"+id;}).join(",");
+			var target_node_ids = target_edges.map(ele=>{return ele.data('source');}).map(id=>{ return "#"+id;}).join(",");
 
-		if(!!source_node_ids)
-			$scope.selected.outputs = $scope.graph.$(source_node_ids).map(ele=>{ return ele.data()});
-		else
-			$scope.selected.outputs = [];
+			if(!!source_node_ids)
+				$scope.selected.outputs = $scope.graph.$(source_node_ids).map(ele=>{ return ele.data()});
+			else
+				$scope.selected.outputs = [];
 
-		if(!!target_node_ids)
-			$scope.selected.inputs = $scope.graph.$(target_node_ids).map(ele=>{ return ele.data()});
-		else
-			$scope.selected.inputs = [];
+			if(!!target_node_ids)
+				$scope.selected.inputs = $scope.graph.$(target_node_ids).map(ele=>{ return ele.data()});
+			else
+				$scope.selected.inputs = [];
+			
+		}
 
+		var maxDist = 0;
+
+		$scope.graph.nodes().forEach(ele=>{
+			var aStar = $scope.graph.elements().aStar({ root: "#"+ele.data("id"), goal: "#root" });
+			maxDist = Math.max(aStar.distance, maxDist);
+			ele.data("dist", aStar.distance);
+		})
+
+		$scope.graph.nodes().forEach(ele=>{
+
+			var dist = ele.data("dist");
+			var size = (1.3 - (dist / maxDist)) * 100;
+			size = Math.max(size, 20);
+			if(isNaN(dist) == false)
+				ele.data("size", size);
+			else
+				ele.data("size", 10);
+		})
 	}
 
 	$scope.$on('cy:node:select', function(event, data){
@@ -546,25 +574,42 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	})
 
+	
 	$scope.onTimer = function()
 	{
 
 		if(!!$scope.input.autoSave && !!$scope.docRef && !$scope.saving)
 		{
+			
 			$scope.saving == true;
+
 			var eles = angular.copy($scope.graph.elements().jsons()).map(e=>{
 				if('$$hash' in e.data)
 					delete e.data["$$hash"];
+				if('size' in e.data)
+					delete e.data["size"];
+				if('dist' in e.data)
+					delete e.data["dist"];
 				return e;
 			});
 			//console.log(eles);
-			$scope.docRef.set({ name:$scope.currentDoc.name, graph_eles:eles}).then(e=>{
-				console.log("saved!!");
-				$scope.saving == false;
-			}, f=>{
-				console.log("saved failed", f);
-				$scope.saving == false;
-			})
+
+			var saveData  = { name:$scope.currentDoc.name, graph_eles:eles};
+			if($scope.lastSavedDataHash != JSON.stringify(saveData))
+			{
+				$scope.docRef.set(saveData).then(e=>{
+					console.log("saved!!");
+					$scope.saving == false;
+					$scope.lastSavedDataHash = JSON.stringify(saveData);
+				}, f=>{
+					console.log("saved failed", f);
+					$scope.saving == false;
+				})
+			}
+			else
+			{
+				console.log("not changed");
+			}
 		}
 
 		$timeout($scope.onTimer, 2000);
