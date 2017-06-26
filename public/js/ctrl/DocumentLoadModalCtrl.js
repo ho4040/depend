@@ -23,6 +23,11 @@ app.controller("DocumentLoadModalCtrl", function($scope, $uibModalInstance, $fir
 		}
 	}
 
+	$scope.cancel = function()
+	{
+		$uibModalInstance.dismiss();
+	}
+
 	$scope.auth = Auth;
 	$scope.auth.$onAuthStateChanged(function(firebaseUser)
 	{

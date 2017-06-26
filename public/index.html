@@ -13,13 +13,14 @@
 		<script src="bower_components/cytoscape/dist/cytoscape.js"></script>
 		<script src="bower_components/ngCytoscape/ngCytoscape.js"></script>
 		<script src="bower_components/moment/moment.js"></script>
+		<script src="bower_components/angular-prompt/dist/angular-prompt.min.js"></script>
 		<script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js" ></script>
 
 		<!-- Firebase -->
 		<script src="bower_components/firebase/firebase.js"></script>
 		<!-- angular fire -->
 		<script src="bower_components/angularfire/dist/angularfire.js"></script>
-
+		
 		<script>
 			// Initialize the Firebase SDK
 			var config = {
@@ -68,13 +69,14 @@
 
 				<div class="col-xs-12">
 					<div class="btn-group btn-group-justified" >
+						<a class="btn btn-default" ng-click="newDoc()">New</a>
 						<a class="btn btn-default" ng-disabled="!firebaseUser" ng-click="loadDoc()">Load</a>
 						<a class="btn btn-default" ng-disabled="!firebaseUser" ng-click="saveDoc()">Save</a>
 					</div>
 				</div>
 				<div class="col-xs-12">
 					<div class="btn-group btn-group-justified" >
-						<a class="btn btn-default btn-sm" ng-click="addNewNode()">Add new</a>
+						<a class="btn btn-default btn-sm" ng-click="addNewNode()">Add child</a>
 						<a class="btn btn-default btn-sm" ng-click="delete()" ng-disabled="!selected || !selected.data">Remove</a>
 						<a class="btn btn-default btn-sm" ng-click="updateLayout()">Layout</a>
 						<a class="btn btn-default btn-sm" ng-click="editCode()">Code</a>

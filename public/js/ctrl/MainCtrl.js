@@ -1,4 +1,4 @@
-app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Auth, $timeout, $firebaseArray){
+app.controller('MainCtrl', function($rootScope, $scope, $uibModal, prompt, cytoData, Auth, $timeout, $firebaseArray){
 
 	$scope.auth = Auth;	
 	$scope.input = {
@@ -150,9 +150,10 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 	$scope.updateLayout = function(layout)
 	{	
-		$scope.onUpdate();
-		var layout = $scope.graph.makeLayout({name:'cose', animate:true});
-		layout.run();
+		//$scope.onUpdate();
+		//var layout = $scope.graph.makeLayout({name:'cose', animate:true});
+		//layout.run();
+		$scope.graph.fit();
 	}
 
 	$scope.delete = function()
@@ -325,6 +326,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			//$scope.graph.$(":visible").layout($scope.layoutState.list[$scope.layoutState.currentIndex]);
 			$scope.graph.nodes("#"+newNodeId).select();
 			$scope.onUpdate();
+			$scope.updateLayout();
 			$scope.modalInstance = null;
 
 		}, dismissed=>{
@@ -339,6 +341,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		var selector = "[target='"+targetId+"'][source='"+sourceId+"']";
 		$scope.graph.edges(selector).remove();
 		$scope.onUpdate();
+		$scope.updateLayout();
 	}
 
 	$scope.newEdge = function(sourceId, targetId, index=0)
@@ -364,8 +367,46 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 				return e;
 			}));
 			$scope.onUpdate();
-			$scope.graph.$(":visible").layout($scope.layoutState.list[0]);
+			$scope.updateLayout();
+			//$scope.graph.$(":visible").layout($scope.layoutState.list[0]);
 		});
+	}
+
+	$scope.newDoc = function()
+	{
+		var newDocProc = function(){
+			prompt({
+				title:"New document",
+				message:"What is the final goal?",
+				input:true
+			}).then(ret=>{
+
+				$scope.graph.elements().remove();
+				$scope.currentDoc = null;
+				resultData = { id:"root", size:100, name:ret };
+				var childNode = { group:'nodes', data: resultData, selectable:true, position:{x:0,y:0} };
+				var elements = [childNode];
+
+				//Add Node
+				$scope.graph.add(elements);
+				$scope.graph.nodes("#root").select();
+				$scope.onUpdate();
+				$scope.updateLayout();
+
+			})
+		}
+
+		if( $scope.graph.elements().jsons().length > 0 )
+		{
+			prompt({title:"warning", message:"Working document data exist. make new document anyway?"}).then(f=>{
+				newDocProc();		
+			});
+		}
+		else
+		{
+			newDocProc();	
+		}
+
 	}
 
 
@@ -445,27 +486,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	}
 
 	
-	$scope.auth.$onAuthStateChanged(function(firebaseUser)
-	{
-		if( !!firebaseUser )
-		{	
-			var justLogin = false;
-			if($scope.firebaseUser == null)
-				justLogin = true;
-			$scope.firebaseUser = firebaseUser;
-			var ref = firebase.database().ref();
-			$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
-			//console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
-			if(justLogin)
-				$scope.loadDoc();
-		}
-		else
-		{
-			$scope.firebaseUser = null;
-			$scope.documents = null;			
-			console.log("logout");
-		}
-	});
+	
 
 	$scope.changeOutput = function(selected)
 	{
@@ -577,27 +598,11 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 		})
 	}
 
-	$scope.$on('cy:node:select', function(event, data){
-
-		//console.log("node selected!");
-		$scope.selected.element = data.cyTarget;
-		$scope.selected.data = angular.copy(data.cyTarget.data());
-		$scope.onUpdate();		
-
-		var phase = $scope.$root.$$phase;
-		if(phase == '$apply' || phase == '$digest'){
-			//do nothing
-		}else{
-			$scope.$apply();
-		}
-
-	})
-
 	
 	$scope.onTimer = function()
 	{
 
-		if(!!$scope.input.autoSave && !!$scope.docRef && !$scope.saving)
+		if(!!$scope.input.autoSave && !!$scope.docRef && !$scope.saving && !!$scope.currentDoc)
 		{
 			
 			$scope.saving == true;
@@ -635,6 +640,48 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 	}
 
 	$timeout($scope.onTimer, 2000);
+
+	$scope.$on('cy:node:select', function(event, data){
+
+		//console.log("node selected!");
+		$scope.selected.element = data.cyTarget;
+		$scope.selected.data = angular.copy(data.cyTarget.data());
+		$scope.onUpdate();		
+
+		var phase = $scope.$root.$$phase;
+		if(phase == '$apply' || phase == '$digest'){
+			//do nothing
+		}else{
+			$scope.$apply();
+		}
+
+	})
+
+	$scope.auth.$onAuthStateChanged(function(firebaseUser)
+	{
+		if( !!firebaseUser )
+		{	
+			var justLogin = false;
+			if($scope.firebaseUser == null)
+				justLogin = true;
+			$scope.firebaseUser = firebaseUser;
+			var ref = firebase.database().ref();
+			$scope.documents = $firebaseArray(ref.child('user_data').child($scope.firebaseUser.uid).child('documents'));
+			//console.log("$onAuthStateChanged", firebaseUser, $scope.documents);
+			if(justLogin)
+				$scope.loadDoc();
+		}
+		else
+		{
+			if(!!$scope.firebaseUser)
+			{
+				//Just log out
+				$scope.firebaseUser = null;
+				$scope.documents = null;			
+				console.log("logout");
+			}
+		}
+	});
 
 });
 
