@@ -284,7 +284,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 
 		newPos = {x:0, y:0};
 		
-		if(!!parent)
+		if(parent.length > 0)
 		{
 			var parentPos = parent.position();
 			var theta = Math.random() * Math.PI * 2;
@@ -367,6 +367,7 @@ app.controller('MainCtrl', function($rootScope, $scope, $uibModal, cytoData, Aut
 			$scope.graph.$(":visible").layout($scope.layoutState.list[0]);
 		});
 	}
+
 
 	$scope.loadDoc = function()
 	{
