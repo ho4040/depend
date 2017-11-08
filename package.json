@@ -1,0 +1,23 @@
+{
+  "name": "depend",
+  "version": "1.0.0",
+  "description": "Dependency mananging tool for project manager.",
+  "main": "index.js",
+  "dependencies": {
+    "angular-ui-bootstrap": "^2.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ho4040/depend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ho4040/depend/issues"
+  },
+  "homepage": "https://github.com/ho4040/depend#readme"
+}
