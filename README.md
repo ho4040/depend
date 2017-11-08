@@ -14,3 +14,4 @@ you can see demo [here](https://depend-3c524.firebaseapp.com/)
 * Activate / deactivate toggle.
 * Evaluate and sort by dependency.
 * publish graphs and make public URL.
+* Serialize
