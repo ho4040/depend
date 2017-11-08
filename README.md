@@ -15,3 +15,4 @@ you can see demo [here](https://depend-3c524.firebaseapp.com/)
 * Evaluate and sort by dependency.
 * publish graphs and make public URL.
 * Serialize
+* Auto save without document name.
