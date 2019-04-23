@@ -1,5 +1,8 @@
 # Depend*
 
+
+![screenshot](https://i.imgur.com/UMlgpoU.png)
+
 Depend is tool for node graph editing like _Free mind._ it is inspaired by _Free mind_ but little bit different.
 
 the main purpose of this is editing __dependency graphs__.
